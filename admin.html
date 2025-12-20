@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Core — Admin Panel</title>
+    <style>
+        /* =========================================
+           1. CORE THEME & VARIABLES
+           ========================================= */
+        :root {
+            /* Colors */
+            --bg-dark: #0f172a;       /* Deep Slate */
+            --bg-card: #1e293b;       /* Lighter Slate */
+            --bg-input: #334155;      /* Input Background */
+            --text-main: #f8fafc;     /* White/Off-white */
+            --text-muted: #94a3b8;    /* Muted Gray */
+            
+            --gold: #facc15;          /* Premium Gold */
+            --gold-dim: rgba(250, 204, 21, 0.1);
+            --gold-hover: #eab308;
+            
+            --emerald: #10b981;       /* Success Green */
+            --emerald-dim: rgba(16, 185, 129, 0.1);
+            
+            --danger: #ef4444;        /* Red */
+            --locked: #64748b;        /* Locked Gray */
+
+            /* Dimensions & Effects */
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 15px rgba(250, 204, 21, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; font-size: 15px; }
+        
+        /* Typography Helpers */
+        .text-gold { color: var(--gold); }
+        .text-emerald { color: var(--emerald); }
+        .text-danger { color: var(--danger); }
+        .text-muted { color: var(--text-muted); }
+        .font-bold { font-weight: 700; }
+        .uppercase { text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Layout Utilities */
+        .hidden { display: none !important; }
+        .flex { display: flex; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .col-span-2 { grid-column: span 2; }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } .col-span-2 { grid-column: span 1; } }
+
+        /* =========================================
+           2. UI COMPONENTS
+           ========================================= */
+        
+        /* Buttons */
+        .btn {
+            padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: var(--transition);
+            font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-gold:hover:not(:disabled) { background: var(--gold-hover); box-shadow: 0 0 10px var(--gold); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+        .btn-outline:hover:not(:disabled) { border-color: var(--text-main); color: var(--text-main); }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background: var(--danger); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+        /* Inputs */
+        input, select, textarea {
+            background: var(--bg-input); border: 1px solid transparent; color: white; padding: 10px 12px; 
+            border-radius: 6px; width: 100%; outline: none; transition: var(--transition);
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-dim); }
+        label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; margin-top: 12px; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card); border-radius: var(--radius); padding: 24px; 
+            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: var(--shadow);
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .card:hover { border-color: rgba(250, 204, 21, 0.3); box-shadow: var(--glow); transform: translateY(-2px); }
+        
+        .card-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+        }
+        .card-title { font-size: 1.1rem; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 8px; }
+
+        /* Badges */
+        .badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .badge-live { background: var(--emerald-dim); color: var(--emerald); border: 1px solid var(--emerald); }
+        .badge-draft { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); border: 1px solid var(--text-muted); }
+        .badge-lock { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* Scrollable Areas */
+        .scroll-area { max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--bg-input); border-radius: 4px; }
+
+        /* Lists */
+        .list-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; 
+        }
+        .list-item:last-child { border-bottom: none; }
+        
+        .log-item { 
+            display: grid; grid-template-columns: 80px 1fr; gap: 10px; padding: 8px 0; 
+            border-left: 2px solid var(--bg-input); padding-left: 12px; margin-bottom: 4px; font-size: 0.85rem; 
+        }
+        .log-time { color: var(--text-muted); font-size: 0.75rem; }
+
+        /* =========================================
+           3. SPECIFIC VIEWS
+           ========================================= */
+        
+        /* Login */
+        #login-view {
+            height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+        .login-box { width: 100%; max-width: 400px; padding: 40px; background: var(--bg-card); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; display: flex; justify-content: center; align-items: center;
+        }
+        .modal-box { background: var(--bg-card); padding: 30px; border-radius: var(--radius); width: 90%; max-width: 500px; border: 1px solid var(--gold); }
+
+    </style>
+</head>
+<body>
+
+    <div id="login-view">
+        <div class="login-box">
+            <h2 class="text-gold uppercase" style="margin-bottom: 20px; letter-spacing: 2px;">Study Core Admin</h2>
+            <form onsubmit="Auth.login(event)">
+                <div style="text-align: left;">
+                    <label>Select Identity</label>
+                    <select id="loginUser" required>
+                        <option value="" disabled selected>Select Admin...</option>
+                        <option value="Aditya">Aditya (Creator)</option>
+                        <option value="Arjun">Arjun (Admin)</option>
+                        <option value="Arpit">Arpit (Admin)</option>
+                    </select>
+                </div>
+                <div style="text-align: left;">
+                    <label>Security Key</label>
+                    <input type="password" id="loginPass" placeholder="Enter Password" required>
+                </div>
+                <div id="loginError" class="text-danger" style="margin-top: 15px; font-size: 0.9rem; min-height: 20px;"></div>
+                <button type="submit" class="btn btn-gold" style="width: 100%; margin-top: 20px;">AUTHENTICATE</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="hidden">
+        
+        <header style="background: var(--bg-card); padding: 15px 30px; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 100;" class="flex-between">
+            <div class="flex" style="gap: 15px;">
+                <h3 class="text-gold font-bold">Study Core — Admin Panel</h3>
+                <div class="flex" id="statusBadges">
+                    <span class="badge badge-live">● LIVE</span>
+                    <span class="badge badge-draft hidden" id="badgeDraft">DRAFT MODE</span>
+                    <span class="badge badge-lock hidden" id="badgeLock">LOCKED</span>
+                </div>
+            </div>
+            <div class="flex" style="gap: 10px;">
+                <a href="leaderboard.html" class="btn btn-outline" style="text-decoration: none;">Leaderboard</a>
+                <a href="index.html" class="btn btn-outline" style="text-decoration: none;">Home</a>
+                <button onclick="Auth.logout()" class="btn btn-danger" style="margin-left: 10px;">Logout</button>
+            </div>
+        </header>
+
+        <div style="padding: 30px; max-width: 1400px; margin: 0 auto;">
+            <div class="grid">
+
+                <div class="card">
+                    <div class="card-header"><span class="card-title">⚡ Current Session</span></div>
+                    <div class="flex" style="gap: 15px;">
+                        <div id="userAvatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--gold); color: black; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">A</div>
+                        <div>
+                            <h4 id="userNameDisplay">Admin</h4>
+                            <div class="text-gold" style="font-size: 0.8rem;" id="userRoleDisplay">Role</div>
+                            <div class="text-muted" style="font-size: 0.8rem; margin-top: 4px;">
+                                <span style="color: var(--emerald);">●</span> Online: <span id="sessionTimer">0</span>m
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card col-span-2">
+                    <div class="card-header">
+                        <span class="card-title">⚙️ System Control</span>
+                        <div class="flex" style="gap: 10px;">
+                            <button class="btn btn-outline" onclick="System.createSnapshot()">📸 Create Backup</button>
+                            <button class="btn btn-danger" onclick="System.toggleLock()" id="lockBtn">🔒 Toggle Emergency Lock</button>
+                        </div>
+                    </div>
+                    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                            <h4 class="text-muted uppercase" style="font-size: 0.75rem; margin-bottom: 10px;">Deployment</h4>
+                            <div class="flex-between">
+                                <span class="text-muted" style="font-size: 0.9rem;">Status: <strong id="deployStatus" class="text-emerald">Synced</strong></span>
+                                <button class="btn btn-gold" onclick="System.publishDraft()" id="publishBtn" disabled>Apply Draft to Live</button>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                            <h4 class="text-muted uppercase" style="font-size: 0.75rem; margin-bottom: 10px;">Disaster Recovery</h4>
+                            <div class="flex-between">
+                                <span class="text-muted" style="font-size: 0.9rem;">Snapshots available: <strong id="snapCount">0</strong></span>
+                                <button class="btn btn-outline" onclick="System.restoreSnapshot()" style="font-size: 0.8rem; color: var(--danger); border-color: var(--danger);">Restore Last</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card col-span-2">
+                    <div class="card-header">
+                        <span class="card-title">👥 Member Management</span>
+                        <span class="text-muted" style="font-size: 0.8rem;">DRAFT STATE</span>
+                    </div>
+                    <div class="flex" style="gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="newMemberInput" placeholder="Enter Student Name (e.g. Rohan Sharma)...">
+                        <button class="btn btn-gold" onclick="Members.add()">+ Add</button>
+                    </div>
+                    <div class="scroll-area" id="memberList">
+                        </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">🏅 Anniversary Badge (Live)</span>
+                        <span id="badgeStatusIndicator" class="badge badge-draft">checking...</span>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; margin-bottom: 20px;">
+                        <div class="text-muted" style="font-size: 0.8rem;">CURRENT WINNER (LOCKED)</div>
+                        <h3 id="liveBadgeHolder" class="text-gold" style="margin: 10px 0; font-size: 1.4rem;">—</h3>
+                        <button class="btn btn-outline" style="font-size: 0.75rem; padding: 4px 8px; border-color: var(--danger); color: var(--danger);" onclick="BadgeSystem.reset()">
+                            ❌ Remove Badge / Unlock Game
+                        </button>
+                    </div>
+
+                    <div>
+                        <label class="text-muted">Transfer Badge To (Overwrites Current)</label>
+                        <div class="flex" style="gap: 10px;">
+                            <select id="liveBadgeSelect" style="flex: 1;">
+                                <option value="">Loading members...</option>
+                            </select>
+                            <button class="btn btn-gold" onclick="BadgeSystem.transfer()">Set Winner</button>
+                        </div>
+                        <p class="text-muted" style="font-size: 0.75rem; margin-top: 8px;">
+                            * This updates <code>studycore_winner</code> immediately.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card col-span-2">
+                    <div class="card-header">
+                        <span class="card-title">🏆 Leaderboard Manager (Live)</span>
+                        <button class="btn btn-outline" style="font-size:0.7rem;" onclick="LeaderboardSystem.resetAll()">Reset All</button>
+                    </div>
+
+                    <div class="grid" style="grid-template-columns: 1fr 1fr; gap:20px;">
+                        
+                        <div>
+                            <h4 class="text-gold uppercase" style="font-size:0.8rem; margin-bottom:10px;">1. Set Top 3 Podium</h4>
+                            <div class="flex" style="gap:10px; margin-bottom:10px;">
+                                <select id="lbMemberSelect" style="flex:1;"><option>Load Members...</option></select>
+                                <select id="lbRankSelect" style="width:100px;">
+                                    <option value="1">1st 🥇</option>
+                                    <option value="2">2nd 🥈</option>
+                                    <option value="3">3rd 🥉</option>
+                                </select>
+                                <button class="btn btn-gold" onclick="LeaderboardSystem.setPodium()">Set</button>
+                            </div>
+                            <div id="lbPodiumPreview" style="font-size:0.8rem; color:#aaa; margin-bottom:20px;"></div>
+
+                            <h4 class="text-gold uppercase" style="font-size:0.8rem; margin-bottom:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:15px;">2. Set Core Champion</h4>
+                            <select id="lbChampSelect" style="margin-bottom:10px;"><option>Load Members...</option></select>
+                            <input id="lbChampTitle" placeholder="Title (e.g. Study Core Champion)" style="margin-bottom:10px;">
+                            <input id="lbChampDesc" placeholder="Description (e.g. For consistency...)" style="margin-bottom:10px;">
+                            
+                            <div class="flex" style="gap: 10px; margin-bottom: 15px;">
+                                <button class="btn btn-gold" style="flex: 1;" onclick="LeaderboardSystem.setChampion()">Update Champion</button>
+                                <button class="btn btn-danger" style="flex: 1;" onclick="LeaderboardSystem.removeChampion()">Remove (Pass)</button>
+                            </div>
+
+                            <div id="lbChampPreview" style="font-size:0.8rem; color:#aaa; margin-top:5px; margin-bottom:15px;"></div>
+                            
+                            <h5 class="text-muted uppercase" style="font-size:0.7rem; margin-bottom:5px;">History Log</h5>
+                            <div class="scroll-area" id="champHistoryLog" style="height:100px; background:rgba(0,0,0,0.2); border-radius:8px; padding:10px; font-size:0.75rem; color:#ccc;"></div>
+                        </div>
+
+                        <div style="border-left:1px solid rgba(255,255,255,0.05); padding-left:20px;">
+                            <h4 class="text-gold uppercase" style="font-size:0.8rem; margin-bottom:10px;">3. Community Builders</h4>
+                            <div class="flex" style="gap:10px; margin-bottom:10px;">
+                                <input id="lbInviter" placeholder="Inviter Name">
+                                <input id="lbStudent" placeholder="Invited Student">
+                                <button class="btn btn-gold" onclick="LeaderboardSystem.addBuilder()">Add</button>
+                            </div>
+                            <div class="scroll-area" id="lbBuilderList" style="height:200px; background:rgba(0,0,0,0.2); border-radius:8px; padding:10px;">
+                                </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card col-span-2">
+                    <div class="card-header">
+                        <span class="card-title">📜 Audit Log</span>
+                        <button class="btn btn-outline" style="font-size: 0.7rem;" onclick="Logs.clear()">Clear Local View</button>
+                    </div>
+                    <div class="scroll-area" id="activityLog">
+                        </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const KEY_LIVE = "sc_live_state";
+        const KEY_DRAFT = "sc_draft_state";
+        const KEY_LOGS = "sc_activity_log";
+        const KEY_SNAPS = "sc_snapshots";
+        const KEY_SHARED_PASS = "studycore_passwords"; // Central Shared Storage
+        
+        const USERS = {
+            "Aditya": { role: "Creator" },
+            "Arjun": { role: "Admin" },
+            "Arpit": { role: "Admin" }
+        };
+
+        // --- GLOBAL STATE ---
+        let CURRENT_USER = null;
+
+        // =========================================================
+        // 1. DATA MANAGER
+        // =========================================================
+        const Data = {
+            init: function() {
+                // BOOTSTRAP CHECK: If empty, initialize mandatory defaults to avoid null errors
+                if (!localStorage.getItem(KEY_LIVE)) {
+                     const cleanState = { members: [], badge: { holder: null, history: [] }, locked: false };
+                     localStorage.setItem(KEY_LIVE, JSON.stringify(cleanState));
+                }
+                if (!localStorage.getItem(KEY_DRAFT)) localStorage.setItem(KEY_DRAFT, localStorage.getItem(KEY_LIVE));
+                if (!localStorage.getItem(KEY_LOGS)) localStorage.setItem(KEY_LOGS, JSON.stringify([]));
+                if (!localStorage.getItem(KEY_SNAPS)) localStorage.setItem(KEY_SNAPS, JSON.stringify([]));
+            },
+            getDraft: () => JSON.parse(localStorage.getItem(KEY_DRAFT)),
+            setDraft: (data) => {
+                localStorage.setItem(KEY_DRAFT, JSON.stringify(data));
+                UI.render();
+            },
+            getLive: () => JSON.parse(localStorage.getItem(KEY_LIVE)),
+            publish: () => {
+                const draft = Data.getDraft();
+                localStorage.setItem(KEY_LIVE, JSON.stringify(draft));
+                Logs.add("Applied DRAFT changes to LIVE.");
+                UI.render();
+            },
+            createSnapshot: () => {
+                const snaps = JSON.parse(localStorage.getItem(KEY_SNAPS));
+                const current = Data.getLive();
+                current._timestamp = new Date().toLocaleString();
+                snaps.unshift(current);
+                if(snaps.length > 5) snaps.pop();
+                localStorage.setItem(KEY_SNAPS, JSON.stringify(snaps));
+                Logs.add("Created System Snapshot.");
+                UI.render();
+            },
+            restoreSnapshot: () => {
+                const snaps = JSON.parse(localStorage.getItem(KEY_SNAPS));
+                if(snaps.length === 0) return alert("No snapshots found.");
+                if(!confirm("DANGER: This will overwrite current Data. Proceed?")) return;
+                const backup = snaps[0];
+                delete backup._timestamp;
+                localStorage.setItem(KEY_LIVE, JSON.stringify(backup));
+                localStorage.setItem(KEY_DRAFT, JSON.stringify(backup));
+                Logs.add("Restored System from Snapshot.");
+                UI.render();
+            }
+        };
+
+        // =========================================================
+        // 2. LOGGING SYSTEM
+        // =========================================================
+        const Logs = {
+            add: (action) => {
+                const logs = JSON.parse(localStorage.getItem(KEY_LOGS));
+                const entry = { user: CURRENT_USER, action: action, time: new Date().toLocaleString() };
+                logs.unshift(entry);
+                if(logs.length > 100) logs.pop();
+                localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
+                UI.renderLogs();
+            },
+            clear: () => {
+                if(confirm("Clear local log view?")) {
+                    localStorage.setItem(KEY_LOGS, JSON.stringify([]));
+                    UI.renderLogs();
+                }
+            }
+        };
+
+        // =========================================================
+        // 3. AUTH SYSTEM
+        // =========================================================
+        const Auth = {
+            login: (e) => {
+                e.preventDefault();
+                const user = document.getElementById('loginUser').value;
+                const pass = document.getElementById('loginPass').value;
+                const err = document.getElementById('loginError');
+
+                // Read Password from centralized Storage
+                const storedPasswords = JSON.parse(localStorage.getItem(KEY_SHARED_PASS) || "{}");
+                const correctPass = storedPasswords.adminLogin; 
+
+                if (pass === correctPass && correctPass) {
+                    CURRENT_USER = user;
+                    Logs.add("Admin Logged In");
+                    document.getElementById('login-view').classList.add('hidden');
+                    document.getElementById('dashboard-view').classList.remove('hidden');
+                    
+                    document.getElementById('userNameDisplay').innerText = user;
+                    document.getElementById('userRoleDisplay').innerText = USERS[user].role;
+                    document.getElementById('userAvatar').innerText = user.charAt(0);
+                    
+                    let m = 0; setInterval(() => { m++; document.getElementById('sessionTimer').innerText = m; }, 60000);
+                    
+                    UI.render();
+                    BadgeSystem.init();
+                    LeaderboardSystem.init(); // Init Leaderboard
+
+                } else {
+                    err.innerText = "ACCESS DENIED: Invalid Credentials.";
+                    Logs.add(`Failed Login Attempt (${user})`);
+                }
+            },
+            logout: () => location.reload()
+        };
+
+        // =========================================================
+        // 4. FEATURE MODULES
+        // =========================================================
+        function syncMembersToPublic() {
+            // Update the CENTRAL PASSWORD STORE with new members
+            const storedData = JSON.parse(localStorage.getItem(KEY_SHARED_PASS) || "{}");
+            if (!storedData.users) storedData.users = {};
+
+            const draftMembers = Data.getDraft().members;
+
+            // Ensure base users exist
+            const baseUsers = {
+                "SC-ADITYA-C01": { name: "Aditya", role: "Creator" },
+                "SC-ARJUN-A02": { name: "Arjun", role: "Admin" },
+                "SC-ARPIT-A03": { name: "Arpit", role: "Admin" }
+            };
+
+            // Merge draft members into users object if they don't exist
+            // NOTE: This simple logic assumes simple name matching for now.
+            // In a real app, ID management would be stricter.
+            draftMembers.forEach(m => {
+                // Create a pseudo-ID
+                const id = "SC-" + m.name.toUpperCase().substring(0,4) + "-" + m.id;
+                // Only add if not strictly present (simplified)
+                // Real implementation would manage keys better, but this ensures they appear in index.html
+                // We'll just update a "custom" list within the storage for index.html to read if needed,
+                // OR better: we don't overwrite the MAIN users object blindly to avoid deleting passwords.
+                // For this task, we will just ensure they exist in index.html's view by relying on
+                // the fact index.html reads from studycore_passwords.users.
+                
+                // Let's add them to studycore_passwords.users
+                let exists = false;
+                for (const k in storedData.users) {
+                    if (storedData.users[k].name === m.name) exists = true;
+                }
+                
+                if (!exists) {
+                     storedData.users[id] = { name: m.name, role: "Member" };
+                }
+            });
+
+            localStorage.setItem(KEY_SHARED_PASS, JSON.stringify(storedData));
+            
+            // Also update the legacy key for backward compatibility if any parts still use it
+            const fullMembers = [
+                { name: "Aditya Kumar Shukla", role: "creator" },
+                { name: "Arjun", role: "admin" },
+                { name: "Arpit", role: "admin" },
+                ...draftMembers.map(m => ({ name: m.name, role: "member" }))
+            ];
+            localStorage.setItem("studycore_members", JSON.stringify(fullMembers));
+            
+            BadgeSystem.populateDropdown();
+            LeaderboardSystem.populateDropdowns(); 
+        }
+
+        const Members = {
+            add: () => {
+                const input = document.getElementById('newMemberInput');
+                const name = input.value.trim();
+                if(!name) return;
+                const data = Data.getDraft();
+                if(data.locked) return alert("System is LOCKED. Cannot edit.");
+                if(data.members.some(m => m.name.toLowerCase() === name.toLowerCase())) return alert("Member already exists!");
+                data.members.push({ id: Date.now(), name: name });
+                Data.setDraft(data);
+                syncMembersToPublic();
+                Logs.add(`Added member: ${name}`);
+                input.value = "";
+            },
+            remove: (id) => {
+                const data = Data.getDraft();
+                if(data.locked) return alert("System is LOCKED.");
+                if(!confirm("Remove this student?")) return;
+                const mem = data.members.find(m => m.id === id);
+                data.members = data.members.filter(m => m.id !== id);
+                Data.setDraft(data);
+                syncMembersToPublic();
+                Logs.add(`Removed member: ${mem.name}`);
+            }
+        };
+
+        const System = {
+            toggleLock: () => {
+                const data = Data.getDraft();
+                data.locked = !data.locked;
+                Data.setDraft(data);
+                Logs.add(`Toggled Emergency Lock: ${data.locked ? "ON" : "OFF"}`);
+            },
+            publishDraft: () => {
+                if(confirm("Are you sure? This updates the public website.")) Data.publish();
+            },
+            createSnapshot: () => Data.createSnapshot(),
+            restoreSnapshot: () => Data.restoreSnapshot()
+        };
+
+        // =========================================================
+        // 5. UI MANAGER
+        // =========================================================
+        const UI = {
+            render: () => {
+                const draft = Data.getDraft();
+                const live = Data.getLive();
+                const isDiff = JSON.stringify(draft) !== JSON.stringify(live);
+                const isLocked = draft.locked;
+
+                const badgeDraft = document.getElementById('badgeDraft');
+                const badgeLock = document.getElementById('badgeLock');
+                const btnPublish = document.getElementById('publishBtn');
+                const btnLock = document.getElementById('lockBtn');
+                const txtStatus = document.getElementById('deployStatus');
+
+                if(isDiff) {
+                    badgeDraft.classList.remove('hidden');
+                    btnPublish.disabled = false;
+                    btnPublish.classList.add('btn-gold');
+                    txtStatus.innerText = "Unsaved Changes";
+                    txtStatus.className = "text-gold";
+                } else {
+                    badgeDraft.classList.add('hidden');
+                    btnPublish.disabled = true;
+                    btnPublish.classList.remove('btn-gold');
+                    txtStatus.innerText = "Synced";
+                    txtStatus.className = "text-emerald";
+                }
+
+                if(isLocked) {
+                    badgeLock.classList.remove('hidden');
+                    btnLock.innerText = "🔓 Unlock System";
+                } else {
+                    badgeLock.classList.add('hidden');
+                    btnLock.innerText = "🔒 Toggle Emergency Lock";
+                }
+
+                const list = document.getElementById('memberList');
+                list.innerHTML = "";
+                draft.members.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = "list-item";
+                    div.innerHTML = `<span>${m.name}</span><button class="btn btn-danger" style="padding: 2px 8px; font-size: 0.7rem;" onclick="Members.remove(${m.id})">Remove</button>`;
+                    list.appendChild(div);
+                });
+
+                const snaps = JSON.parse(localStorage.getItem(KEY_SNAPS));
+                document.getElementById('snapCount').innerText = snaps.length;
+                UI.renderLogs();
+            },
+            renderLogs: () => {
+                const logs = JSON.parse(localStorage.getItem(KEY_LOGS));
+                const container = document.getElementById('activityLog');
+                container.innerHTML = "";
+                logs.forEach(l => {
+                    container.innerHTML += `<div class="log-item"><div class="log-time">${l.time.split(',')[1]}</div><div><strong class="text-gold">${l.user || 'System'}</strong>: ${l.action}</div></div>`;
+                });
+            }
+        };
+
+        /* =========================================
+           🏆 LIVE BADGE SYSTEM
+           ========================================= */
+        const BadgeSystem = {
+            KEYS: { MEMBERS: "studycore_members", WINNER: "studycore_winner" },
+            init: function() { this.renderStatus(); this.populateDropdown(); },
+            renderStatus: function() {
+                const winner = localStorage.getItem(this.KEYS.WINNER);
+                const display = document.getElementById('liveBadgeHolder');
+                const indicator = document.getElementById('badgeStatusIndicator');
+                if (winner) {
+                    display.innerText = winner;
+                    indicator.innerText = "LOCKED";
+                    indicator.className = "badge badge-lock";
+                } else {
+                    display.innerText = "None (Game Open)";
+                    indicator.innerText = "AVAILABLE";
+                    indicator.className = "badge badge-live";
+                }
+            },
+            populateDropdown: function() {
+                const select = document.getElementById('liveBadgeSelect');
+                if(!select) return;
+                // Read from legacy key for now as it contains the full list (static + dynamic)
+                const membersData = JSON.parse(localStorage.getItem(this.KEYS.MEMBERS) || "[]");
+                select.innerHTML = '<option value="">-- Select Member --</option>';
+                if (membersData.length === 0) { select.innerHTML = '<option value="">No members found</option>'; return; }
+                membersData.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.name;
+                    opt.innerText = m.name + (m.role ? ` (${m.role})` : '');
+                    select.appendChild(opt);
+                });
+            },
+            transfer: function() {
+                const select = document.getElementById('liveBadgeSelect');
+                const name = select.value;
+                if (!name) return alert("Please select a member first.");
+                if (confirm(`⚠️ OVERWRITE: Give badge to "${name}"?`)) {
+                    localStorage.setItem(this.KEYS.WINNER, name);
+                    alert(`✅ Success! ${name} is now the winner.`);
+                    this.renderStatus();
+                    Logs.add(`Badge transferred to: ${name}`);
+                }
+            },
+            reset: function() {
+                if (confirm("⚠️ RESET: Remove badge and unlock game?")) {
+                    localStorage.removeItem(this.KEYS.WINNER);
+                    alert("✅ Badge cleared. Game open.");
+                    this.renderStatus();
+                    Logs.add("Badge Reset (Game Unlocked)");
+                }
+            }
+        };
+
+        /* =========================================
+           🏆 NEW LEADERBOARD SYSTEM (The Controller)
+           ========================================= */
+        const LeaderboardSystem = {
+            KEY_LB: "studycore_leaderboard",
+            KEY_MEM: "studycore_members",
+            KEY_CHAMP: "studycore_core_champion",
+            KEY_HIST: "studycore_core_champion_history",
+            
+            init: function() {
+                this.populateDropdowns();
+                this.render();
+                this.renderHistory();
+            },
+
+            // 1. Get/Set Data
+            getData: function() {
+                return JSON.parse(localStorage.getItem(this.KEY_LB)) || { podium: [], builders: [] };
+            },
+            save: function(data) {
+                localStorage.setItem(this.KEY_LB, JSON.stringify(data));
+                this.render();
+            },
+            
+            // HISTORY LOGIC
+            getHistory: function() {
+                return JSON.parse(localStorage.getItem(this.KEY_HIST) || "[]");
+            },
+            addToHistory: function(name, action) {
+                const hist = this.getHistory();
+                const entry = { name, action, date: new Date().toLocaleString() };
+                hist.unshift(entry); // Add to top
+                localStorage.setItem(this.KEY_HIST, JSON.stringify(hist));
+                this.renderHistory();
+            },
+
+            // 2. Populate Selectors from Members (Validation)
+            populateDropdowns: function() {
+                const mems = JSON.parse(localStorage.getItem(this.KEY_MEM) || "[]");
+                const selects = [document.getElementById('lbMemberSelect'), document.getElementById('lbChampSelect')];
+                
+                selects.forEach(sel => {
+                    if(!sel) return;
+                    sel.innerHTML = '<option value="">-- Select Member --</option>';
+                    mems.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.name;
+                        opt.innerText = m.name;
+                        sel.appendChild(opt);
+                    });
+                });
+            },
+
+            // 3. Actions
+            setPodium: function() {
+                const name = document.getElementById('lbMemberSelect').value;
+                const rank = document.getElementById('lbRankSelect').value;
+                if(!name) return alert("Select a member first.");
+
+                const data = this.getData();
+                // Remove existing entry for this rank if any
+                data.podium = data.podium.filter(p => p.rank != rank);
+                // Add new
+                data.podium.push({ name, rank });
+                this.save(data);
+                Logs.add(`Leaderboard: Set Rank ${rank} to ${name}`);
+            },
+
+            setChampion: function() {
+                const name = document.getElementById('lbChampSelect').value;
+                const title = document.getElementById('lbChampTitle').value.trim();
+                const desc = document.getElementById('lbChampDesc').value.trim();
+                if(!name) return alert("Select a member first.");
+
+                // Save to separate Key
+                const champData = { name, title, desc };
+                localStorage.setItem(this.KEY_CHAMP, JSON.stringify(champData));
+                
+                // Add to History
+                this.addToHistory(name, "SET/REPLACED");
+
+                alert("Champion Updated!");
+                Logs.add(`Leaderboard: Champion set to ${name}`);
+                this.render();
+            },
+
+            removeChampion: function() {
+                // Read Password from centralized Storage
+                const storedPasswords = JSON.parse(localStorage.getItem(KEY_SHARED_PASS) || "{}");
+                const REMOVE_PASS = storedPasswords.coreRemove;
+
+                if (!REMOVE_PASS) {
+                    alert("Error: Core Champion Remove Password not set in Password Manager.");
+                    return;
+                }
+
+                const input = prompt("🔐 PASSWORD REQUIRED\nEnter admin password to REMOVE Core Champion:");
+                
+                if (input === REMOVE_PASS) {
+                    const current = JSON.parse(localStorage.getItem(this.KEY_CHAMP));
+                    if (!current) return alert("No champion is currently set.");
+
+                    localStorage.removeItem(this.KEY_CHAMP);
+                    this.addToHistory(current.name, "REMOVED");
+                    
+                    alert("✅ Core Champion has been removed.");
+                    Logs.add("Leaderboard: Core Champion REMOVED");
+                    this.render();
+                } else {
+                    alert("⛔ ACCESS DENIED: Incorrect Password.");
+                }
+            },
+
+            addBuilder: function() {
+                const inviter = document.getElementById('lbInviter').value.trim();
+                const student = document.getElementById('lbStudent').value.trim();
+                if(!inviter || !student) return alert("Fill both names.");
+
+                const data = this.getData();
+                if(!data.builders) data.builders = [];
+                data.builders.push({ inviter, student });
+                this.save(data);
+                
+                document.getElementById('lbInviter').value = "";
+                document.getElementById('lbStudent').value = "";
+                Logs.add(`Leaderboard: Added Builder entry`);
+            },
+
+            removeBuilder: function(index) {
+                if(!confirm("Remove this entry?")) return;
+                const data = this.getData();
+                data.builders.splice(index, 1);
+                this.save(data);
+                Logs.add(`Leaderboard: Removed Builder entry`);
+            },
+
+            resetAll: function() {
+                if(confirm("⚠ RESET ALL LEADERBOARD DATA? This cannot be undone.")) {
+                    localStorage.removeItem(this.KEY_LB);
+                    localStorage.removeItem(this.KEY_CHAMP);
+                    this.render();
+                    Logs.add("Leaderboard: Full Reset");
+                    alert("Leaderboard cleared.");
+                }
+            },
+
+            // 4. Render Admin View
+            render: function() {
+                const data = this.getData();
+
+                // Podium Preview
+                const podDiv = document.getElementById('lbPodiumPreview');
+                podDiv.innerHTML = "<strong>Current:</strong> " + (data.podium || []).map(p => `Rank ${p.rank}: ${p.name}`).join(" | ");
+
+                // Champion Preview
+                const champDiv = document.getElementById('lbChampPreview');
+                const champData = JSON.parse(localStorage.getItem(this.KEY_CHAMP));
+                if(champData) {
+                    champDiv.innerHTML = `<strong>Current:</strong> ${champData.name} - ${champData.title}`;
+                    champDiv.className = "text-emerald";
+                } else {
+                    champDiv.innerHTML = "No Champion Active";
+                    champDiv.className = "text-muted";
+                }
+
+                // Builders List
+                const list = document.getElementById('lbBuilderList');
+                list.innerHTML = "";
+                (data.builders || []).forEach((b, i) => {
+                    const row = document.createElement("div");
+                    row.style.display = "flex"; 
+                    row.style.justifyContent = "space-between";
+                    row.style.marginBottom = "5px";
+                    row.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
+                    row.innerHTML = `
+                        <span style="font-size:0.8rem;">${b.inviter} → ${b.student}</span>
+                        <button class="btn btn-danger" style="padding:0 5px; font-size:0.7rem;" onclick="LeaderboardSystem.removeBuilder(${i})">X</button>
+                    `;
+                    list.appendChild(row);
+                });
+            },
+
+            renderHistory: function() {
+                const hist = this.getHistory();
+                const div = document.getElementById('champHistoryLog');
+                if(!div) return;
+                div.innerHTML = "";
+                hist.forEach(h => {
+                   div.innerHTML += `
+                    <div style="border-bottom:1px solid rgba(255,255,255,0.05); padding:4px 0;">
+                        <span class="${h.action === 'REMOVED' ? 'text-danger' : 'text-emerald'}">[${h.action}]</span>
+                        <span class="text-gold">${h.name}</span> <br>
+                        <span style="opacity:0.6;">${h.date}</span>
+                    </div>
+                   `; 
+                });
+            }
+        };
+
+        // Initialize Data on Load
+        Data.init();
+
+    </script>
+</body>
+</html>

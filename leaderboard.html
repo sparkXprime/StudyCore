@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Study Core | Hall of Rankings</title>
+
+<style>
+/* ================= CORE THEME ================= */
+:root{
+  --bg: rgb(96,108,56);
+  --accent-red: rgb(158,42,43);
+  --gold: #FFD166;
+  --gold-2: #FFB300;
+  --card-bg: #ffffff;
+  --muted: #555;
+}
+
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  font-family:"Poppins",sans-serif;
+  background:var(--bg);
+  color:#111;
+}
+
+/* ================= NAV ================= */
+.nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:86px;
+  display:flex;
+  align-items:center;
+  padding:10px 22px;
+  gap:12px;
+  background:linear-gradient(
+    180deg,
+    rgba(0,0,0,0.18),
+    rgba(255,255,255,0.02)
+  );
+  backdrop-filter:blur(6px);
+  z-index:999;
+}
+
+.logo{
+  width:88px;
+  height:66px;
+  border-radius:10px;
+  object-fit:cover;
+  box-shadow:0 6px 18px rgba(0,0,0,0.35);
+}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+}
+
+.brand .title{
+  color:var(--gold);
+  font-weight:800;
+}
+
+.brand .sub{
+  color:rgba(255,255,255,0.9);
+  font-size:12px;
+  font-weight:600;
+}
+
+.nav-right{
+  margin-left:auto;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.btn{
+  padding:8px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+  color:white;
+  border:1px solid rgba(255,255,255,.1);
+}
+
+#modeToggle{
+  padding:8px 12px;
+  border-radius:10px;
+  border:none;
+  font-weight:800;
+  background:linear-gradient(90deg,var(--gold),var(--gold-2));
+  color:#111;
+}
+
+.menu-btn{
+  background:none;
+  border:none;
+  font-size:22px;
+  color:white;
+}
+
+/* ================= PAGE ================= */
+.page{
+  padding-top:120px;
+  max-width:1200px;
+  margin:auto;
+  padding-inline:20px;
+}
+
+/* ================= ROYAL HALL BOX ================= */
+.hall-box{
+  position:relative;
+  text-align:center;
+  margin:10px auto 80px;
+  padding:46px 40px;
+  max-width:860px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,215,102,0.30),
+      rgba(255,215,102,0.12)
+    );
+
+  border-radius:30px;
+  border:3px solid var(--gold);
+
+  box-shadow:
+    0 0 70px rgba(255,215,102,0.5),
+    inset 0 0 28px rgba(255,215,102,0.3);
+}
+
+.hall-symbol{
+  font-size:42px;
+  margin-bottom:8px;
+  filter:drop-shadow(0 0 10px rgba(255,215,102,0.9));
+}
+
+.hall-box h1{
+  font-size:42px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  margin:0;
+  color:#111;
+  text-shadow:
+    0 2px 0 rgba(255,255,255,0.4),
+    0 6px 16px rgba(0,0,0,0.35);
+}
+
+.hall-divider{
+  width:140px;
+  height:4px;
+  margin:18px auto 16px;
+  border-radius:4px;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    var(--gold),
+    transparent
+  );
+}
+
+.hall-box p{
+  font-size:15px;
+  line-height:1.7;
+  margin:0;
+  color:#222;
+}
+
+/* ================= PODIUM ================= */
+.podium{
+  display:grid;
+  grid-template-columns:1fr 1.25fr 1fr;
+  gap:26px;
+  align-items:end;
+  margin-bottom:90px;
+}
+
+.podium-card{
+  background:var(--card-bg);
+  border-radius:22px;
+  padding:30px 24px;
+  text-align:center;
+  box-shadow:0 18px 55px rgba(0,0,0,.28);
+  transition:transform .4s ease, box-shadow .4s ease;
+  position:relative;
+}
+
+.podium-card:hover{
+  transform:translateY(-14px);
+  box-shadow:0 30px 80px rgba(0,0,0,.4);
+}
+
+.podium-card.gold{
+  transform:translateY(-28px);
+  border:3px solid var(--gold);
+}
+
+.podium-card.gold:hover{
+  transform:translateY(-40px);
+}
+
+.rank-icon{
+  font-size:40px;
+  margin-bottom:6px;
+}
+
+.podium-card h3{
+  margin:10px 0 6px;
+  font-size:21px;
+  font-weight:900;
+}
+
+.podium-card span{
+  font-size:14px;
+  font-weight:700;
+  color:var(--accent-red);
+}
+
+/* ================= BUILDER LEADERBOARD ================= */
+
+.builder-board{
+  background:var(--card-bg);
+  border-radius:22px;
+  padding:36px 36px 30px;
+  margin-bottom:90px;
+
+  /* Card feel */
+  box-shadow:
+    0 16px 45px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.4);
+
+  border:1px solid rgba(0,0,0,.08);
+
+  transition:transform .35s ease, box-shadow .35s ease;
+}
+
+.builder-board:hover{
+  transform:translateY(-6px);
+  box-shadow:
+    0 28px 70px rgba(0,0,0,.38),
+    inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+
+
+
+.builder-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+
+  padding:16px 22px;
+  border-radius:14px;
+  margin-bottom:16px;
+
+  background:linear-gradient(
+    90deg,
+    rgba(255,215,102,.22),
+    rgba(255,215,102,.06)
+  );
+
+  font-weight:800;
+
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
+
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+
+.builder-row:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 32px rgba(0,0,0,.22);
+}
+
+/* ================= CORE CHAMPION (ROYAL PREMIUM) ================= */
+
+.core-champion{
+  max-width:1200px;
+  margin:0 auto 40px;
+  padding:0 18px;
+  text-align:center;
+}
+
+/* Title */
+.core-champion h2{
+  margin:0;
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:1.5px;
+  color:#FFD700;
+  text-shadow:
+    0 0 12px rgba(255,215,0,0.7),
+    0 0 24px rgba(255,215,0,0.35);
+}
+
+.champion-period{
+  margin:8px 0 22px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.85);
+}
+
+/* Champion Card */
+.champion-card{
+  position:relative;
+  background:linear-gradient(145deg,#ffffff,#fff4cc);
+  border-radius:22px;
+  padding:26px;
+  display:flex;
+  align-items:center;
+  gap:26px;
+  max-width:700px;
+  margin:0 auto;
+
+  border:2px solid #FFD700;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.35),
+    inset 0 0 0 1px rgba(255,215,0,0.25);
+
+  transition:transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* Golden aura */
+.champion-card::before{
+  content:"";
+  position:absolute;
+  inset:-12px;
+  border-radius:30px;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,215,0,0.45),
+    transparent
+  );
+  filter:blur(18px);
+  opacity:0.6;
+  z-index:-1;
+  transition:opacity 0.35s ease;
+}
+
+/* Rotating Crown Badge */
+.champion-card::after{
+  content:"👑";
+  position:absolute;
+  top:-22px;
+  right:-22px;
+  width:56px;
+  height:56px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:28px;
+  background:linear-gradient(135deg,#FFD700,#FFB300);
+  border-radius:50%;
+
+  box-shadow:
+    0 14px 34px rgba(0,0,0,0.4),
+    inset 0 0 0 2px rgba(255,255,255,0.35);
+
+  transform-style:preserve-3d;
+  animation:crownSpin 6s linear infinite;
+}
+
+/* Hover */
+.champion-card:hover{
+  transform:translateY(-10px) scale(1.015);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.45),
+    inset 0 0 0 1px rgba(255,215,0,0.35);
+}
+
+.champion-card:hover::before{
+  opacity:1;
+}
+
+/* Photo */
+.champion-photo{
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#eee;
+
+  border:5px solid #FFD700;
+  box-shadow:
+    0 0 0 5px rgba(255,215,0,0.25),
+    0 12px 34px rgba(0,0,0,0.35);
+
+  transition:transform 0.35s ease;
+}
+
+.champion-card:hover .champion-photo{
+  transform:scale(1.05);
+}
+
+/* Info */
+.champion-info{
+  text-align:left;
+}
+
+.champion-name{
+  margin:0;
+  font-size:24px;
+  font-weight:900;
+  color:#7a1c1c;
+  letter-spacing:0.6px;
+}
+
+.champion-title{
+  margin:6px 0;
+  font-size:14px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:#111;
+}
+
+.champion-desc{
+  margin:8px 0 0;
+  font-size:13px;
+  color:#333;
+  line-height:1.6;
+}
+
+/* Crown Animation */
+@keyframes crownSpin{
+  0%{
+    transform:rotateY(0deg) rotateX(0deg);
+  }
+  50%{
+    transform:rotateY(180deg) rotateX(14deg);
+  }
+  100%{
+    transform:rotateY(360deg) rotateX(0deg);
+  }
+}
+
+/* Mobile */
+@media(max-width:600px){
+  .champion-card{
+    flex-direction:column;
+    text-align:center;
+  }
+  .champion-info{
+    text-align:center;
+  }
+}
+s/* ================= DARK MODE ================= */
+body.dark{
+  background:#0f172a;
+  color:#e5e7eb;
+}
+
+body.dark .podium-card,
+body.dark .builder-board,
+body.dark .champion{
+  background:#020617;
+  color:#e5e7eb;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="nav">
+  <img src="logo.jpg" class="logo">
+  <div class="brand">
+    <span class="title">STUDY CORE</span>
+    <span class="sub">Established: 21 April 2025</span>
+  </div>
+
+  <div class="nav-right">
+    <a href="index.html" class="btn">🏠 Home</a>
+    <button id="modeToggle">Dark Mode</button>
+    <button class="menu-btn">☰</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="hall-box">
+    <div class="hall-symbol">🏛</div>
+    <h1>Hall of Rankings</h1>
+    <div class="hall-divider"></div>
+    <p>
+      This is not a list.<br>
+      <strong>This is recognition earned through consistency, contribution, and trust.</strong>
+    </p>
+  </div>
+
+  <div class="podium">
+    <div class="podium-card">
+      <div class="rank-icon">🥈</div>
+      <h3>Second Place</h3>
+      <span>Name</span>
+    </div>
+
+    <div class="podium-card gold">
+      <div class="rank-icon">🥇</div>
+      <h3>Champion of the Cycle</h3>
+      <span>Name</span>
+    </div>
+
+    <div class="podium-card">
+      <div class="rank-icon">🥉</div>
+      <h3>Third Place</h3>
+      <span>Name</span>
+    </div>
+  </div>
+
+  <div class="builder-row">
+  <span>👤 Inviter Name</span>
+  <span class="builder-rank gold-rank">Invited Student: 🥇 Gold</span>
+</div>
+
+<div class="builder-row">
+  <span>👤 Inviter Name</span>
+  <span class="builder-rank silver-rank">Invited Student: 🥈 Silver</span>
+</div>
+
+<div class="builder-row">
+  <span>👤 Inviter Name</span>
+  <span class="builder-rank bronze-rank">Invited Student: 🥉 Bronze</span>
+</div>
+
+  <section class="core-champion">
+  <h2>🏆 CORE CHAMPION</h2>
+  <p class="champion-period">Bi-Weekly Champion</p>	
+
+  <div class="champion-card">
+    <img src="champion.jpg" alt="Core Champion" class="champion-photo">
+
+    <div class="champion-info">
+      <h3 class="champion-name">Arpit Sharma</h3>
+      <p class="champion-title">Study Core Champion</p>
+      <p class="champion-desc">
+        Awarded for consistency, discipline, and helping others.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+</div>
+
+<script>
+document.getElementById("modeToggle").onclick=()=>{
+  document.body.classList.toggle("dark");
+};
+</script>
+
+<script>
+    /* =========================================
+       🔗 CONNECT TO ADMIN PANEL (LOGIC ONLY)
+       ========================================= */
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // 1. READ DATA
+        const KEY_LB = "studycore_leaderboard";
+        const KEY_CHAMP = "studycore_core_champion";
+        
+        const rawData = localStorage.getItem(KEY_LB);
+        const champData = localStorage.getItem(KEY_CHAMP);
+        
+        // If no data exists yet, log it (HTML defaults show)
+        if (!rawData && !champData) console.log("StudyCore: No admin data found.");
+
+        const data = rawData ? JSON.parse(rawData) : { podium: [], builders: [] };
+
+        // 2. UPDATE PODIUM (Top 3)
+        // HTML Structure: [Rank 2 Card] -> [Rank 1 Card (Gold)] -> [Rank 3 Card]
+        const podiumCards = document.querySelectorAll('.podium-card');
+
+        if (podiumCards.length >= 3) {
+            const getRank = (r) => (data.podium || []).find(p => p.rank == r);
+
+            // Update Middle Card (Rank 1 - Gold) - Index 1 in DOM
+            const r1 = getRank(1);
+            if (r1) {
+                const nameSpan = podiumCards[1].querySelector('span');
+                if (nameSpan) nameSpan.innerText = r1.name;
+            }
+
+            // Update Left Card (Rank 2) - Index 0 in DOM
+            const r2 = getRank(2);
+            if (r2) {
+                const nameSpan = podiumCards[0].querySelector('span');
+                if (nameSpan) nameSpan.innerText = r2.name;
+            }
+
+            // Update Right Card (Rank 3) - Index 2 in DOM
+            const r3 = getRank(3);
+            if (r3) {
+                const nameSpan = podiumCards[2].querySelector('span');
+                if (nameSpan) nameSpan.innerText = r3.name;
+            }
+        }
+
+        // 3. UPDATE BUILDERS LIST
+        const builderRows = document.querySelectorAll('.builder-row');
+        const builderData = data.builders || [];
+
+        builderRows.forEach((row, index) => {
+            if (index < builderData.length) {
+                // Data exists: Update text
+                const entry = builderData[index];
+                const spans = row.querySelectorAll('span');
+                
+                // First span: Inviter Name
+                if (spans[0]) spans[0].innerText = `👤 ${entry.inviter}`;
+                
+                // Second span: Invited Student
+                if (spans[1]) {
+                    spans[1].childNodes[0].textContent = `Invited: ${entry.student}`; 
+                }
+                row.style.display = "flex"; // Ensure it's visible
+            } else {
+                // No data: Hide the row
+                row.style.display = "none";
+            }
+        });
+
+        // 4. UPDATE CORE CHAMPION
+        // Logic: Checks specific champion key. If null, show "No Active Champion".
+        const cName = document.querySelector('.champion-name');
+        const cTitle = document.querySelector('.champion-title');
+        const cDesc = document.querySelector('.champion-desc');
+        
+        if (champData) {
+            const champ = JSON.parse(champData);
+            if (cName) cName.innerText = champ.name;
+            if (cTitle) {
+                cTitle.innerText = champ.title;
+                cTitle.style.display = "block";
+            }
+            if (cDesc) {
+                cDesc.innerText = champ.desc;
+                cDesc.style.display = "block";
+            }
+        } else {
+            // No Champion Active (Removed or Cleared)
+            if (cName) cName.innerText = "No Active Champion";
+            if (cTitle) cTitle.style.display = "none";
+            if (cDesc) cDesc.style.display = "none";
+        }
+
+    });
+</script>
+
+</body>
+</html>

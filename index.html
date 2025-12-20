@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Study Core — Official Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Profile bar */
+#profileBar{
+  background:#1b4332;
+  color:#fff;
+  height:28px;
+  line-height:28px;
+  text-align:center;
+  font-weight:600;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+  display:none; 
+}
+.site-unlocked{ padding-top: 55px; }
+
+/* Blur site before login */
+#siteContent{
+  filter: blur(6px);
+  pointer-events: none;
+  transition: 0.3s ease;
+}
+
+/* Login overlay */
+#loginOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.65);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.login-box{
+  background:#fff;
+  padding:24px;
+  width:300px;
+  border-radius:12px;
+  text-align:center;
+}
+.login-box input{
+  width:100%;
+  padding:10px;
+  margin:12px 0;
+}
+.login-box button{
+  width:100%;
+  padding:10px;
+  background:#2d6a4f;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+#loginError{ color:red; font-size:12px; }
+
+:root{
+  --bg: rgb(96,108,56);
+  --accent-red: rgb(158,42,43);
+  --gold: #FFD166;
+  --gold-2: #FFB300;
+  --card-bg: #ffffff;
+  --muted: #666;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:"Poppins",sans-serif;background:var(--bg);color:#0f1720;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer}
+
+.page{min-height:100vh;padding-top:104px;padding-bottom:48px;transition:background .35s ease,color .35s ease}
+
+/* NAV */
+.nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:86px;
+  display:flex;
+  align-items:center;
+  padding:10px 22px;
+  gap:12px;
+  background:linear-gradient(180deg,rgba(0,0,0,0.18),rgba(255,255,255,0.02));
+  backdrop-filter:blur(6px);
+  z-index:999;
+  transform: translateY(-8px);
+}
+
+.logo{width:88px;height:66px;border-radius:10px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+.brand{display:flex;flex-direction:column}
+.brand .title{color:var(--gold);font-weight:800}
+.brand .sub{color:rgba(255,255,255,0.9);font-size:12px;font-weight:600}
+.nav-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.06);color:white;border:1px solid rgba(255,255,255,0.06)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+#modeToggle{padding:8px 12px;border-radius:10px;border:none;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--gold-2));color:#111;box-shadow:0 6px 20px rgba(255,200,0,0.14)}
+
+/* HERO */
+.hero{
+  max-width:1200px;
+  margin:0 auto;
+  margin-top:-16px;
+  padding:8px 22px 10px;
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+}
+.hero-card{background:#fff;border-radius:14px;padding:22px;display:flex;gap:18px;align-items:flex-start;box-shadow:0 12px 40px rgba(4,4,4,0.32);border:1px solid rgba(0,0,0,0.06)}
+.hero-left{flex:1}
+.hero-title{font-size:28px;font-weight:800;color:var(--accent-red);margin:0}
+.hero-desc{color:#111;margin-top:10px;line-height:1.5}
+
+.creator{margin-top:12px;display:flex;gap:12px;align-items:center}
+.creator .name{font-weight:800;font-size:18px;display:flex;gap:10px;align-items:center}
+.crown{width:28px;animation:floatCrown 2s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,220,80,0.8))}
+@keyframes floatCrown{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+.badge-creator{padding:6px 12px;border-radius:12px;font-weight:800;background:linear-gradient(90deg,var(--gold),var(--gold-2));color:#111;box-shadow:0 6px 18px rgba(255,190,20,0.12)}
+
+.stats{display:flex;gap:12px;margin-top:16px}
+.stat{min-width:120px;background:#fff;padding:12px;border-radius:10px;text-align:center;box-shadow:0 8px 22px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.04)}
+.stat .num{font-weight:800;font-size:18px;color:var(--accent-red)}
+.muted{color:var(--muted);font-size:13px}
+
+.grid{max-width:1200px;margin:20px auto;display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start;padding:0 18px}
+
+.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.10);border:1px solid rgba(0,0,0,0.04);transition:transform .3s ease}
+.card:hover{transform:translateY(-6px);box-shadow:0 20px 46px rgba(0,0,0,0.12)}
+
+.members-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+input.search{padding:10px 12px;border-radius:12px;border:1px solid rgba(0,0,0,0.08);width:220px}
+select.filter{padding:9px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.08)}
+
+table.members{width:100%;border-collapse:collapse;font-size:15px}
+table.members thead th{text-align:center;padding:12px;background:linear-gradient(180deg,var(--accent-red),#b73333);color:#fff8d6;font-weight:700;cursor:pointer}
+table.members tbody td{padding:12px;text-align:center;border-bottom:1px solid #f0f0f0}
+table.members tbody tr:nth-child(even) td{background:#fbfbfb}
+table.members tbody tr:hover td{background:linear-gradient(90deg,rgba(255,215,0,0.06),rgba(255,215,0,0.03))}
+
+.badge-admin{background:var(--accent-red);color:white;padding:6px 10px;border-radius:12px;font-weight:700;animation:adminGlow 1.8s infinite}
+@keyframes adminGlow{0%{box-shadow:0 0 0 rgba(255,0,0,0)}50%{box-shadow:0 8px 20px rgba(158,42,43,0.12)}100%{box-shadow:0 0 0 rgba(255,0,0,0)}}
+.badge-member{background:#1864ab;color:white;padding:6px 10px;border-radius:12px;font-weight:700}
+
+.badge-winner{display:inline-block;padding:6px 12px;background:linear-gradient(90deg,var(--gold),var(--gold-2));color:#111;border-radius:14px;font-weight:800;box-shadow:0 6px 16px rgba(255,190,20,0.18);margin-left:8px}
+
+.rules-card{background:#ff7aa2;color:#111;border-radius:12px;padding:16px}
+.quick-card{background:#f4d35e;border-radius:12px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
+
+footer{text-align:center;color:rgba(255,255,255,0.95);margin-top:26px;font-size:13px}
+
+/* Game Panel */
+.game-panel{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+.game-box{width:100%;max-width:1024px;border-radius:12px;padding:18px;background:#001428;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(16,229,255,0.06)}
+.game-area{ box-sizing: content-box; position:relative;background:#001428;height:520px;border-radius:12px;overflow:hidden;margin-top:12px;border:1px solid rgba(16,229,255,0.08)}
+.player{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);width:120px;height:26px;border-radius:12px;background:linear-gradient(90deg,#0bd,#06f);box-shadow:0 8px 30px rgba(16,229,255,0.12)}
+.crown-img{position:absolute;width:36px}
+
+.controls{display:flex;gap:12px;justify-content:center;margin-top:12px}
+.control-btn{width:90px;height:48px;border-radius:10px;border:none;background:linear-gradient(90deg,#0bd,#06f);color:white;font-weight:800;font-size:16px;box-shadow:0 8px 24px rgba(0,150,255,0.12)}
+.btn-gold{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--gold),var(--gold-2));color:#111;font-weight:800}
+
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:3000;visibility:hidden;opacity:0;transition:opacity .28s}
+.modal.show{visibility:visible;opacity:1}
+.modal .card{max-width:420px;background:#fff;color:#111;padding:18px;border-radius:12px}
+
+.egg-hint{font-size:13px;color:rgba(255,255,255,0.85);margin-top:8px}
+
+@media(max-width:980px){
+  .grid{grid-template-columns:1fr;padding:0 14px}
+  .nav-right a.btn{display:none}
+  .hero{padding:10px 12px}
+  .game-area{height:420px}
+  .player{width:84px}
+}
+
+/* ===== DARK MODE ===== */
+html.dark, body.dark{ background:#0f172a !important; color:#e5e7eb; }
+body.dark .page{ background:#0f172a; color:#e5e7eb; }
+body.dark .card{ background:#020617; color:#e5e7eb; border:1px solid rgba(255,255,255,0.08); }
+body.dark .hero-card{ background:#020617; color:#e5e7eb; }
+body.dark .rules-card{ background:#1f2937; color:#e5e7eb; }
+body.dark table.members thead th{ background:linear-gradient(180deg,#111827,#1f2937); }
+body.dark table.members tbody td{ background:#020617; color:#e5e7eb; }
+body.dark .quick-card{ background:#1f2937; color:#e5e7eb; }
+body.dark footer{ color:#cbd5f5; }
+
+#confettiCanvas{ position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+.menu-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 6px 10px; }
+.menu { display: none; position: absolute; top: 70px; right: 20px; background: #ffffff; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); overflow: hidden; z-index: 999; min-width: 180px; }
+.menu a { display: block; padding: 12px 16px; text-decoration: none; color: #000; font-weight: 500; }
+.menu a:hover { background: #f2f2f2; }
+.site-footer{ margin-top: 40px; padding: 18px 10px; text-align: center; font-size: 14px; color: #fff; background: rgba(0,0,0,0.25); backdrop-filter: blur(6px); }
+.site-footer span{ display: block; margin-top: 4px; font-size: 12px; opacity: 0.85; }
+</style>
+
+<script>
+/* =========================================
+   BOOTSTRAP LOGIC (AUTO-FIX EMPTY STORAGE)
+   ========================================= */
+(function() {
+  const STORAGE_KEY = "studycore_passwords";
+  const DEFAULT_DATA = {
+    users: {
+      "SC-ADITYA-C01": { name: "Aditya", role: "Creator" },
+      "SC-ARJUN-A02": { name: "Arjun", role: "Admin" },
+      "SC-ARPIT-A03": { name: "Arpit", role: "Admin" },
+      "SC-PRINCE-M04": { name: "Prince", role: "Member" },
+      "SC-ANSHK-M05": { name: "Ansh Karan", role: "Member" },
+      "SC-ANSHC-M06": { name: "Ansh Chaudhary", role: "Member" },
+      "SC-ARYAN-M07": { name: "Aryan", role: "Member" },
+      "SC-HARSH-M08": { name: "Harsh Singh", role: "Member" },
+      "SC-NAREN-M09": { name: "Narendra", role: "Member" },
+      "SC-OJASH-M10": { name: "Ojashvi", role: "Member" },
+      "SC-UZAIR-M11": { name: "Uzair", role: "Member" },
+      "SC-JAI-M12": { name: "Jai", role: "Member" },
+      "SC-ATHAR-M13": { name: "Atharv", role: "Member" },
+      "SC-DHRUV-M14": { name: "Dhruv", role: "Member" }
+    },
+    adminLogin: "/LOGIN",
+    coreRemove: "/VOID"
+  };
+
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    console.log("Initializing Study Core Bootstrap...");
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+  }
+})();
+
+/* LOGIN SYSTEM - Access Control (LocalStorage Integrated) */
+function login(){
+  const code = document.getElementById("accessCode").value.trim();
+  const error = document.getElementById("loginError");
+  
+  // 1. Fetch passwords from centralized localStorage
+  const storedData = localStorage.getItem("studycore_passwords");
+  let users = {};
+
+  if(storedData){
+    try {
+      const parsedData = JSON.parse(storedData);
+      if(parsedData.users){
+        users = parsedData.users;
+      }
+    } catch(e){
+      console.error("Error parsing password data", e);
+    }
+  }
+
+  // 2. Validate User
+  if(users[code]){
+    sessionStorage.setItem("studyCoreUser", JSON.stringify(users[code]));
+    unlock(users[code]);
+  }else{
+    error.textContent = "Invalid access code";
+  }
+}
+
+function unlock(user){
+  document.getElementById("loginOverlay").style.display = "none";
+  const content = document.getElementById("siteContent");
+  content.style.filter = "blur(0)";
+  content.style.pointerEvents = "auto";
+  content.classList.add("site-unlocked");
+  const bar = document.getElementById("profileBar");
+  bar.style.display = "block";
+  bar.innerHTML = `WELCOME ${user.name.toUpperCase()} 👋 | ROLE: ${user.role.toUpperCase()}`;
+}
+
+window.onload = () => {
+  const saved = sessionStorage.getItem("studyCoreUser");
+  if(saved){ unlock(JSON.parse(saved)); }
+};
+</script>
+</head>
+
+<body>
+<div id="profileBar" style="display:none;"></div>
+<div id="loginOverlay">
+  <div class="login-box">
+    <h2>🔐 Study Core Access</h2>
+    <p>Enter your access code</p>
+    <input type="text" id="accessCode" placeholder="SC-XXXX-000">
+    <button onclick="login()">Unlock</button>
+    <p id="loginError"></p>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<div class="page">
+  <div id="siteContent">
+  <nav class="nav">
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="logo.jpg" alt="Study Core Logo" class="logo" id="pageLogo">
+    <div class="brand">
+      <span class="title">STUDY CORE</span>
+      <span class="sub">Established: 21 April 2025</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button id="playGameBtn" class="btn">🎮 Play Anniversary Game</button>
+    <button id="modeToggle">Dark Mode</button>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+
+<div id="menu" class="menu">
+  <a href="#about">ℹ️ About</a>
+  <a href="#members">👥 Members</a>
+  <a href="#rules">📜 Rules</a>
+  <a href="leaderboard.html">🏆 Leaderboard</a>
+  <a href="admin.html">🧑‍💼 Admin Panel</a>
+  <a href="pass.html">🔐Password Manager</a>
+
+</div>
+
+  <section class="hero" id="home">
+    <div class="hero-card">
+      <div class="hero-left">
+        <h1 class="hero-title">Study Core — Student Collective</h1>
+        <p class="hero-desc">A disciplined school-based work-sharing group for classwork, notes sharing and fast doubt resolution. Respectful, focused, and helpful — that’s Study Core.</p>
+
+        <div class="creator">
+          <div class="name">
+            <img src="https://cdn-icons-png.flaticon.com/512/1998/1998611.png" class="crown" />
+            Aᴅɪᴛʏᴀ
+          </div>
+          <div class="badge-creator">Group Creator</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="num" id="totalCount">—</div><div class="muted">Total Members</div></div>
+          <div class="stat"><div class="num" id="adminCount">—</div><div class="muted">Admins</div></div>
+          <div class="stat"><div class="num" id="memberCount">—</div><div class="muted">Members</div></div>
+        </div>
+      </div>
+
+      <aside style="width:260px;">
+        <div style="padding:12px;border-radius:12px;background:#fff;box-shadow:0 10px 28px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04)">
+          <div style="font-weight:700;color:var(--accent-red)">Estd.</div>
+          <div style="font-weight:800;font-size:18px;margin-top:6px;color:#111">21 Apr, 2025</div>
+          <div style="margin-top:8px;color:#333">Active study group for collaborative classwork & fast help.</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="grid" id="about">
+    <div>
+      <div class="card">
+        <h3 style="color:var(--accent-red);margin:0">About Study Core</h3>
+        <p style="margin-top:10px;color:#222">
+          Study Core was created on <strong>21 April 2025</strong> to connect classmates, share classwork, and resolve doubts quickly while keeping discussions focused on studies.
+        </p>
+      </div>
+
+      <div class="card" id="members" style="margin-top:18px">
+        <div class="members-header">
+          <h3 style="color:var(--accent-red);margin:0">Members</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="memberSearch" class="search" placeholder="Search name...">
+            <select id="postFilter" class="filter">
+              <option value="all">All</option>
+              <option value="group creator">Group Creator</option>
+              <option value="admin">Admins</option>
+              <option value="member">Members</option>
+            </select>
+            <button onclick="downloadPDF()" class="btn">Download PDF</button>
+          </div>
+        </div>
+
+        <div style="overflow:auto; max-height:520px; margin-top:12px;">
+          <table class="members" id="membersTable">
+            <thead>
+              <tr><th onclick="sortTable(0)">S.No</th><th onclick="sortTable(1)">Name</th><th onclick="sortTable(2)">Post</th></tr>
+            </thead>
+            <tbody id="membersList">
+            </tbody>
+          </table>
+        </div>
+      </div> 
+
+      <div class="card rules-card" id="rules" style="margin-top:18px;">
+        <h3 style="margin:0;color:var(--accent-red)">Rules & Guidelines</h3>
+        <ol style="margin-top:10px">
+          <li>ʀᴜʟᴇ 𝟷 — ᴏɴʟʏ sᴄʜᴏᴏʟ ʀᴇʟᴀᴛᴇᴅ ᴄᴏɴᴛᴇɴᴛ ɪs ᴀʟʟᴏᴡᴇᴅ.</li>
+          <li>ʀᴜʟᴇ 𝟸 — ɴᴏ ᴠᴏɪᴄᴇ/ᴠɪᴅᴇᴏ ᴄᴀʟʟs ᴡɪᴛʜᴏᴜᴛ ᴀᴅᴍɪɴ ᴘᴇʀᴍɪssɪᴏɴ.</li>
+          <li>ʀᴜʟᴇ 𝟹 — ʀᴇsᴘᴇᴄᴛ ᴇᴠᴇʀʏᴏɴᴇ, ɴᴏ ɪɴsᴜʟᴛ ᴏʀ ᴛᴇᴀsɪɴɢ.</li>
+          <li>ʀᴜʟᴇ 𝟺 — 3 ᴡᴀʀɴɪɴɢs = ʀᴇᴍᴏᴠᴀʟ.</li>
+          <li>ʀᴜʟᴇ 𝟻 — ᴏɴᴇ ᴡᴀʀɴɪɴɢ ᴘᴇʀ ʀᴜʟᴇ ʙʀᴇᴀᴋ.</li>
+          <li>ʀᴜʟᴇ 𝟼 — ɴᴏ ᴍᴇᴍᴇs, ɢɪғ, ᴊᴏᴋᴇs, ᴏʀ sᴘᴀᴍ.</li>
+          <li>ʀᴜʟᴇ 𝟽 — ᴀʟᴡᴀʏs ᴛʜᴀɴᴋ ᴛʜᴇ ᴘᴇʀsᴏɴ ᴡʜᴏ ʜᴇʟᴘs ʏᴏᴜ.</li>
+          <li>ʀᴜʟᴇ 𝟾 — ᴀᴅᴍɪɴs ʜᴀᴠᴇ ғᴜʟʟ ғᴀɪʀ ᴘᴏᴡᴇʀs.</li>
+          <li>ʀᴜʟᴇ 𝟿 — ᴅᴏɴ'ᴛ ᴀsᴋ ғᴏʀ sᴀᴍᴇ ᴡᴏʀᴋ ᴀɢᴀɪɴ, sᴄʀᴏʟʟ ғɪʀsᴛ.</li>
+          <li>ʀᴜʟᴇ 𝟷𝟶 — sʜᴀʀᴇ ᴄʟᴇᴀʀ, ᴘʀᴏᴘᴇʀ ᴘᴅғ ᴏɴʟʏ.</li>
+        </ol>
+      </div>
+
+      <div class="card" id="feedback" style="margin-top:18px">
+        <h3 style="color:var(--accent-red);margin:0">Feedback & Suggestions</h3>
+        <p style="margin-top:8px;color:#333">Share your ideas to help improve the Study Core group or website.</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdPyTOTbABqrwn2eeCcZCRoZSc0ya7zIgwiBXlReXYrZvGSfA/viewform?usp=dialog" target="_blank" class="btn" style="display:inline-block;margin-top:10px;background:#F26A8D;border-radius:10px">Submit Feedback Officially (Google Form)</a>
+        <p style="margin-top:8px;font-size:12px;color:#F26A8D">All feedback is reviewed by the admin. Please be clear and respectful.</p>
+        <p id="fbMsg" style="margin-top:10px;font-size:13px;"></p>
+      </div>
+    </div> 
+
+    <aside>
+      <div class="card quick-card">
+        <h4 style="margin:0;color:var(--accent-red)">Quick Info</h4>
+        <p><strong>Creator:</strong> Aditya Kumar Shukla</p>
+        <p><strong>Admins:</strong> Arjun, Arpit</p>
+        <p><strong>Total Members:</strong> <span id="totalCountText">—</span></p>
+        <div class="egg-hint">Click the logo 5 times for a surprise ✨</div>
+      </div>
+      <div class="card" style="margin-top:16px;border-left:6px solid #dc2626">
+        <h4 style="margin:0;color:#dc2626">⚠ Betrayed Trust</h4>
+        <ul style="margin-top:10px;padding-left:18px">
+          <li>Uday</li>
+          <li>Tanish</li>
+          <li>Devesh</li>
+          <li>Shresth</li>
+        </ul>
+      </div>
+    </aside>
+  </section>
+
+  <footer class="site-footer">
+    © Study Core — Established 21 April 2025 <br>
+    <span>Built & Managed by Aditya Kumar Shukla</span>
+  </footer>
+</div>
+</div>
+
+<div class="game-panel" id="gamePanel">
+  <div class="game-box">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;gap:12px;align-items:center">
+        <img src="logo.jpg" style="height:56px;border-radius:8px">
+        <div style="color:var(--gold);font-weight:800">Study Core — Anniversary Game</div>
+      </div>
+      <button id="closeGame" class="btn-gold">Back</button>
+    </div>
+    <div style="margin-top:12px;color:#bfefff">
+      Catch crowns. Miss 7 and the game ends. Reach 35 to win the 🎖️ Winner badge.
+    </div>
+    <div class="game-area" id="gameArea">
+      <div id="player" class="player"></div>
+    </div>
+    <div class="controls">
+      <button id="leftBtn" class="control-btn">LEFT</button>
+      <button id="rightBtn" class="control-btn">RIGHT</button>
+      <button id="startBtn" class="control-btn" style="background:#22c55e">START</button>
+      <button id="resetBtn" class="control-btn" style="background:#ff5c7a">RESET</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal">
+  <div class="card">
+    <h3 id="modalTitle">Game Over</h3>
+    <p id="modalText"></p>
+    <div id="claimSection" style="display:none;margin-top:12px">
+      <div style="margin-bottom:8px">Enter your exact Study Core name:</div>
+      <input id="claimName" placeholder="Type your name" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd" />
+      <div style="margin-top:10px;display:flex;gap:10px;justify-content:flex-end">
+        <button id="cancelClaim" class="btn-gold" style="background:#ddd;color:#111">Cancel</button>
+        <button id="confirmClaim" class="btn-gold">Claim Badge</button>
+      </div>
+      <div id="claimMsg" style="margin-top:8px;color:#111"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+      <button id="closeModal" class="btn-gold">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================
+   CORE LOGIC & BADGE SYSTEM
+   ========================================= */
+const KEYS = {
+    // UPDATED: Now points to the single shared storage key
+    PASSWORDS: "studycore_passwords",
+    WINNER: "studycore_winner"
+};
+
+// 1. RENDER MEMBERS & BADGE
+function renderMembers() {
+    const tbody = document.getElementById("membersList");
+    if (!tbody) return;
+
+    tbody.innerHTML = ""; // Clear existing rows
+
+    // UPDATED: Fetch from studycore_passwords.users
+    let members = [];
+    const storedData = localStorage.getItem(KEYS.PASSWORDS);
+    if(storedData){
+        try{
+            const parsed = JSON.parse(storedData);
+            if(parsed.users){
+                // Convert users object to array
+                members = Object.values(parsed.users);
+            }
+        }catch(e){console.error(e);}
+    }
+
+    const currentWinner = localStorage.getItem(KEYS.WINNER); 
+
+    if(members.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='3'>No members found. Please check database.</td></tr>";
+        updateMemberCounts();
+        return;
+    }
+
+    members.forEach((member, index) => {
+        const row = document.createElement("tr");
+        
+        // Define Role Styles
+        let badgeClass = "badge-member";
+        let badgeText = "Member";
+        let postValue = "member";
+
+        // Normalized comparison for roles
+        const roleLower = member.role.toLowerCase();
+
+        if (roleLower === "creator") {
+            badgeClass = "badge-creator";
+            badgeText = "Group Creator";
+            postValue = "group creator";
+        } else if (roleLower === "admin") {
+            badgeClass = "badge-admin";
+            badgeText = "Admin";
+            postValue = "admin";
+        }
+
+        // Search/Filter Attributes
+        row.setAttribute("data-post", postValue);
+        row.setAttribute("data-name", member.name.toLowerCase());
+
+        // BADGE LOGIC
+        let nameDisplay = member.name;
+        let winnerBadgeHTML = "";
+
+        // Case-insensitive check
+        if (currentWinner && member.name.trim().toLowerCase() === currentWinner.trim().toLowerCase()) {
+            winnerBadgeHTML = ` <span class="badge-winner">🏆 Winner</span>`;
+            row.style.background = "rgba(255, 215, 0, 0.05)"; 
+        }
+
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${nameDisplay} ${winnerBadgeHTML}</td>
+            <td><span class="${badgeClass}">${badgeText}</span></td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    updateMemberCounts(); 
+}
+
+// 2. UPDATE COUNTS
+function updateMemberCounts() {
+    const rows = document.querySelectorAll("#membersList tr");
+    let adminCount = 0;
+    let memberCount = 0;
+
+    rows.forEach(row => {
+        const post = row.dataset.post;
+        if (post === "admin" || post === "group creator") adminCount++;
+        else if(post === "member") memberCount++;
+    });
+
+    const totalEl = document.getElementById("totalCount");
+    const adminEl = document.getElementById("adminCount");
+    const memberEl = document.getElementById("memberCount");
+    const sideTotal = document.getElementById("totalCountText");
+
+    // Only update if rows are actual members (not the 'empty' message)
+    if(rows.length === 1 && rows[0].innerText.includes("No members")) {
+         if (totalEl) totalEl.textContent = "0";
+         if (sideTotal) sideTotal.textContent = "0";
+         return;
+    }
+
+    if (totalEl) totalEl.textContent = rows.length;
+    if (adminEl) adminEl.textContent = adminCount;
+    if (memberEl) memberEl.textContent = memberCount;
+    if (sideTotal) sideTotal.textContent = rows.length;
+}
+
+// 3. SEARCH & FILTER
+const memberSearch = document.getElementById('memberSearch');
+if(memberSearch){
+    memberSearch.addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        document.querySelectorAll('#membersList tr').forEach(tr => {
+            if(tr.innerText.includes("No members found")) return;
+            tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+        });
+    });
+}
+
+const postFilter = document.getElementById('postFilter');
+if(postFilter){
+    postFilter.addEventListener('change', () => {
+        const v = postFilter.value;
+        document.querySelectorAll('#membersList tr').forEach(tr => {
+            if(tr.innerText.includes("No members found")) return;
+            tr.style.display = (v === 'all' || tr.dataset.post === v) ? '' : 'none';
+        });
+    });
+}
+
+// 4. SORTING
+function sortTable(col){
+  const tbody = document.getElementById('membersList');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if(rows.length > 0 && rows[0].innerText.includes("No members")) return;
+
+  const num = col===0;
+  const key = 'sort'+col;
+  let dir = tbody.getAttribute(key)==='desc' ? 'asc' : 'desc';
+  tbody.setAttribute(key,dir);
+
+  rows.sort((a,b)=>{
+    let A=a.children[col].innerText,B=b.children[col].innerText;
+    if(num){ A=+A; B=+B; return dir==='asc'?A-B:B-A; }
+    A=A.toLowerCase(); B=B.toLowerCase();
+    return dir==='asc'?A.localeCompare(B):B.localeCompare(A);
+  });
+
+  rows.forEach((r,i)=>{
+    r.children[0].innerText=i+1;
+    tbody.appendChild(r);
+  });
+}
+
+/* =========================================
+   GAME & CLAIM LOGIC
+   ========================================= */
+const confirmClaimBtn = document.getElementById("confirmClaim");
+const claimNameInput = document.getElementById("claimName");
+const claimMsg = document.getElementById("claimMsg");
+const modal = document.getElementById("modal");
+const closeModal = document.getElementById("closeModal");
+const cancelClaim = document.getElementById("cancelClaim");
+
+// Claim Button Logic
+if(confirmClaimBtn) {
+    confirmClaimBtn.addEventListener('click', () => {
+        const enteredName = claimNameInput.value.trim();
+
+        if(!enteredName) {
+            claimMsg.style.color = "red";
+            claimMsg.textContent = "Please enter a name.";
+            return;
+        }
+
+        // LOCK CHECK
+        const existingWinner = localStorage.getItem(KEYS.WINNER);
+        if (existingWinner) {
+            claimMsg.style.color = "red";
+            claimMsg.textContent = `❌ LOCKED: Badge already held by ${existingWinner}`;
+            return;
+        }
+
+        // MEMBER EXISTENCE CHECK
+        // Updated to check against studycore_passwords.users
+        let members = [];
+        const storedData = localStorage.getItem(KEYS.PASSWORDS);
+        if(storedData) {
+             const parsed = JSON.parse(storedData);
+             if(parsed.users) members = Object.values(parsed.users);
+        }
+
+        const memberExists = members.some(m => m.name.toLowerCase() === enteredName.toLowerCase());
+
+        if (!memberExists) {
+            claimMsg.style.color = "red";
+            claimMsg.textContent = "❌ Name not found in member list. Check spelling.";
+            return;
+        }
+
+        // SUCCESS
+        localStorage.setItem(KEYS.WINNER, enteredName);
+        
+        claimMsg.style.color = "green";
+        claimMsg.textContent = "✅ Badge Claimed Successfully!";
+        spawnConfetti(200);
+        
+        // Render Immediately
+        renderMembers();
+
+        setTimeout(() => {
+            modal.classList.remove('show');
+            claimMsg.textContent = "";
+            claimNameInput.value = "";
+        }, 1500);
+    });
+}
+
+// Modal Closers
+if(closeModal) closeModal.addEventListener('click', ()=>modal.classList.remove('show'));
+if(cancelClaim) cancelClaim.addEventListener('click', ()=>modal.classList.remove('show'));
+
+/* =========================================
+   GAME ENGINE (Unchanged but connected)
+   ========================================= */
+const gamePanel=document.getElementById('gamePanel');
+const gameArea=document.getElementById('gameArea');
+const player=document.getElementById('player');
+const startBtn=document.getElementById('startBtn');
+const resetBtn=document.getElementById('resetBtn');
+const leftBtn=document.getElementById('leftBtn');
+const rightBtn=document.getElementById('rightBtn');
+const playGameBtn=document.getElementById('playGameBtn');
+const closeGame=document.getElementById('closeGame');
+
+let crowns=[];
+let score=0,misses=0,level=1;
+let playerX=0,playerW=120;
+let interval=null,spawn=null,playing=false;
+
+function sizePlayer(){
+  playerW=Math.max(64,Math.min(140,gameArea.clientWidth*0.16));
+  player.style.width=playerW+'px';
+}
+function centerPlayer(){
+  playerX=(gameArea.clientWidth-playerW)/2;
+  player.style.left=playerX+'px';
+}
+function createCrown(){
+  const img=document.createElement('img');
+  img.src="https://cdn-icons-png.flaticon.com/512/1998/1998611.png";
+  img.className="crown-img";
+  const maxX = gameArea.clientWidth - 40; 
+  const x = Math.random() * maxX;
+  img.style.left=x+"px";
+  img.style.top="-40px";
+  gameArea.appendChild(img);
+  crowns.push({el:img,x:x,y:-40,speed:1.4+(level*0.4)});
+}
+function runCrowns(){
+  crowns.forEach((c,i)=>{
+    c.y+=c.speed;
+    c.el.style.top=c.y+"px";
+    const pr=player.getBoundingClientRect();
+    const cr=c.el.getBoundingClientRect();
+    if(cr.bottom>=pr.top && cr.top<=pr.bottom){
+      if(!(cr.right<pr.left || cr.left>pr.right)){
+        score++;
+        c.el.remove();
+        crowns.splice(i,1);
+        if(score%8===0){level++;restartSpawner();}
+        if(score>=35){return endGame(true);}
+      }
+    }
+    if(c.y>gameArea.clientHeight){
+      c.el.remove();
+      crowns.splice(i,1);
+      misses++;
+      if(misses>=7) return endGame(false);
+    }
+  });
+}
+function startGame(){
+  if(playing) return;
+  playing=true; score=0; misses=0; level=1;
+  crowns.forEach(c=>c.el.remove()); crowns=[];
+  sizePlayer(); centerPlayer();
+  interval=setInterval(runCrowns,16);
+  startSpawner();
+}
+function resetGame(){
+  playing=false;
+  clearInterval(interval); clearInterval(spawn);
+  crowns.forEach(c=>c.el.remove()); crowns=[];
+  score=0; misses=0; level=1;
+  sizePlayer(); centerPlayer();
+}
+function startSpawner(){ spawn=setInterval(createCrown,Math.max(350,1400-(level*150))); }
+function restartSpawner(){ clearInterval(spawn); startSpawner(); }
+function endGame(win){
+  playing=false;
+  clearInterval(interval); clearInterval(spawn);
+  modal.classList.add('show');
+  const claimSection = document.getElementById("claimSection");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalText = document.getElementById("modalText");
+
+  if(win){
+    modalTitle.innerText="🎉 Winner!";
+    modalText.innerText=`You scored ${score}. Enter your name to claim badge.`;
+    claimSection.style.display='block';
+  } else {
+    modalTitle.innerText="Game Over";
+    modalText.innerText=`You scored ${score}. Try again!`;
+    claimSection.style.display='none';
+  }
+}
+function move(dx){
+  const maxX = gameArea.offsetWidth - player.offsetWidth;
+  playerX = Math.max(0, Math.min(maxX, playerX + dx));
+  player.style.left = playerX + "px";
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === "ArrowLeft") move(-36);
+  if(e.key === "ArrowRight") move(36);
+});
+if(leftBtn) leftBtn.addEventListener('click', () => move(-36));
+if(rightBtn) rightBtn.addEventListener('click', () => move(36));
+if(playGameBtn) playGameBtn.addEventListener('click',()=>{ gamePanel.style.display='flex'; sizePlayer(); centerPlayer(); });
+if(closeGame) closeGame.addEventListener('click',()=>{ gamePanel.style.display='none'; resetGame(); });
+if(startBtn) startBtn.addEventListener('click',startGame);
+if(resetBtn) resetBtn.addEventListener('click',resetGame);
+
+
+/* =========================================
+   UTILITIES (Confetti, Dark Mode, Menu)
+   ========================================= */
+// Confetti
+const confettiCanvas=document.getElementById('confettiCanvas');
+const ctx=confettiCanvas.getContext('2d');
+function resize(){confettiCanvas.width=innerWidth;confettiCanvas.height=innerHeight}
+resize(); addEventListener('resize',resize);
+let confetti=[];
+function spawnConfetti(n=80){
+  confetti=[];
+  for(let i=0;i<n;i++){
+    confetti.push({
+      x:Math.random()*innerWidth,
+      y:Math.random()*-innerHeight,
+      r:6+Math.random()*6,
+      dx:-2+Math.random()*4,
+      dy:2+Math.random()*4,
+      color:`hsl(${Math.random()*60+40},80%,60%)`
+    });
+  }
+  confettiCanvas.style.display='block';
+  requestAnimationFrame(loop);
+}
+function loop(){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  confetti.forEach(p=>{
+    p.x+=p.dx; p.y+=p.dy; p.dy+=0.03;
+    ctx.fillStyle=p.color;
+    ctx.beginPath();
+    ctx.ellipse(p.x,p.y,p.r,p.r*0.6,0,0,Math.PI*2);
+    ctx.fill();
+  });
+  confetti=confetti.filter(p=>p.y<innerHeight+50);
+  if(confetti.length) requestAnimationFrame(loop);
+  else confettiCanvas.style.display='none';
+}
+
+// Logo Easter Egg
+let clickCount=0;
+const pageLogo = document.getElementById("pageLogo");
+if(pageLogo){
+    pageLogo.addEventListener('click',()=>{
+      clickCount++;
+      if(clickCount===5){
+        spawnConfetti(120);
+        alert("🎉 Secret Surprise Unlocked!");
+        clickCount=0;
+      }
+      setTimeout(()=>clickCount=0,2500);
+    });
+}
+
+// Dark Mode
+(function(){
+  const btn = document.getElementById("modeToggle");
+  if(!btn) return;
+  const savedTheme = localStorage.getItem("studycore-theme");
+  if(savedTheme === "dark"){
+    document.body.classList.add("dark");
+    btn.textContent = "Light Mode";
+  }
+  btn.addEventListener("click", function(){
+    document.body.classList.toggle("dark");
+    if(document.body.classList.contains("dark")){
+      localStorage.setItem("studycore-theme","dark");
+      btn.textContent = "Light Mode";
+    } else {
+      localStorage.setItem("studycore-theme","light");
+      btn.textContent = "Dark Mode";
+    }
+  });
+})();
+
+function toggleMenu() {
+  const menu = document.getElementById("menu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:"smooth"});
+  });
+});
+
+/* =========================================
+   INITIALIZATION
+   ========================================= */
+document.addEventListener("DOMContentLoaded", () => {
+    // Render the members on load from localStorage
+    renderMembers();
+});
+
+</script>
+</body>
+</html>

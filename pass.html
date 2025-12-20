@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Core — Password Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           THEME & UI
+           ========================================= */
+        :root {
+            --bg-dark: #0f172a;        
+            --bg-card: #1e293b;        
+            --bg-input: #334155;       
+            --text-main: #f8fafc;      
+            --text-muted: #94a3b8;     
+            --gold: #facc15;           
+            --gold-hover: #eab308;
+            --emerald: #10b981;        
+            --danger: #ef4444;        
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 40px 20px; display: none; }
+
+        /* Headers */
+        header { max-width: 1000px; margin: 0 auto 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 1.5rem; }
+        .sub-head { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+        /* Grid Layout */
+        .container { max-width: 1000px; margin: 0 auto; display: grid; gap: 30px; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card); border-radius: var(--radius); padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: var(--shadow);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .card-title { font-size: 1.1rem; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 10px; }
+
+        /* Inputs & Tables */
+        input {
+            background: var(--bg-input); border: 1px solid transparent; color: white; padding: 10px 12px;
+            border-radius: 6px; width: 100%; outline: none; transition: 0.3s; font-family: monospace; letter-spacing: 0.5px;
+        }
+        input:focus { border-color: var(--gold); }
+        label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; margin-top: 15px; }
+
+        .user-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .user-table th { text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .user-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+        .user-table tr:last-child td { border-bottom: none; }
+          
+        .role-badge { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .role-creator { background: rgba(250, 204, 21, 0.2); color: var(--gold); }
+        .role-admin { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .role-member { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+        /* Buttons */
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-gold:hover { background: var(--gold-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--text-main); color: var(--text-main); }
+        .btn-icon { padding: 6px; border-radius: 4px; background: var(--emerald); color: white; border: none; cursor: pointer; }
+        
+        /* THE RESET BUTTON STYLE */
+        .btn-reset { 
+            background: var(--danger); color: white; margin-bottom: 20px; width: 100%; 
+            justify-content: center; padding: 12px; font-size: 1rem;
+        }
+        .btn-reset:hover { background: #dc2626; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>🔐 Central Password Manager</h1>
+            <div class="sub-head">Securely manage access credentials for Index & Admin panels.</div>
+        </div>
+        <a href="index.html" class="btn btn-outline">Back to Home</a>
+    </header>
+
+    <div class="container">
+
+        <button class="btn btn-reset" onclick="forceReset()">
+            ⚠️ CLICK HERE IF PASSWORDS ARE NOT WORKING (RESET DATA)
+        </button>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">🛡️ Admin Panel Security</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label>Admin Login Password (Global)</label>
+                    <input type="text" id="adminLoginPass" placeholder="e.g. /LOGIN">
+                </div>
+                <div>
+                    <label>Core Champion Removal Code</label>
+                    <input type="text" id="championRemovePass" placeholder="e.g. /VOID">
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn btn-gold" onclick="saveAdminPasswords()">Update Admin Keys</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">👥 Member Login Codes (Index.html)</div>
+            </div>
+
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Name</th>
+                        <th style="width: 15%;">Role</th>
+                        <th style="width: 40%;">Login Code (Password)</th>
+                        <th style="width: 20%; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+<script>
+    const MASTER_KEY = "Raksha_01!"; // UPDATED MASTER KEY
+    const STORAGE_KEY = "studycore_passwords"; // ORIGINAL SHARED KEY
+
+    // MANDATORY DEFAULT STRUCTURE
+    const DEFAULT_DATA = {
+        users: {
+            "SC-ADITYA-C01": { name: "Aditya", role: "Creator" },
+            "SC-ARJUN-A02": { name: "Arjun", role: "Admin" },
+            "SC-ARPIT-A03": { name: "Arpit", role: "Admin" },
+            "SC-PRINCE-M04": { name: "Prince", role: "Member" },
+            "SC-ANSHK-M05": { name: "Ansh Karan", role: "Member" },
+            "SC-ANSHC-M06": { name: "Ansh Chaudhary", role: "Member" },
+            "SC-ARYAN-M07": { name: "Aryan", role: "Member" },
+            "SC-HARSH-M08": { name: "Harsh Singh", role: "Member" },
+            "SC-NAREN-M09": { name: "Narendra", role: "Member" },
+            "SC-OJASH-M10": { name: "Ojashvi", role: "Member" },
+            "SC-UZAIR-M11": { name: "Uzair", role: "Member" },
+            "SC-JAI-M12": { name: "Jai", role: "Member" },
+            "SC-ATHAR-M13": { name: "Atharv", role: "Member" },
+            "SC-DHRUV-M14": { name: "Dhruv", role: "Member" }
+        },
+        adminLogin: "/LOGIN",
+        coreRemove: "/VOID"
+    };
+
+    (function init() {
+        // BOOTSTRAP: Ensure data exists before anything else
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            console.log("Bootstrap: Initializing default password data...");
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+        }
+
+        const input = prompt("🔐 SECURITY CHECK\nEnter Master Creator Key to access Password Manager:");
+        if (input === MASTER_KEY) {
+            document.body.style.display = "block";
+            loadData();
+        } else {
+            alert("⛔ ACCESS DENIED.");
+            document.body.innerHTML = "<div style='color:#fff;text-align:center;margin-top:50px;font-family:sans-serif;'>ACCESS DENIED</div>";
+            document.body.style.display = "block";
+        }
+    })();
+
+    // === THE FIXER FUNCTION ===
+    // This button will wipe the bad data and reload the fresh Defaults
+    function forceReset() {
+        if(confirm("⚠️ RESET ALL DATA?\nThis will fix the 'not working' issue by resetting all passwords to the default list.\n\nContinue?")) {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload(); // Reload page -> loads DEFAULT_DATA -> Fixes issue
+        }
+    }
+
+    function getData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        // Fail-safe: if deleted while page open
+        if (!raw) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+            return DEFAULT_DATA;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadData() {
+        const data = getData();
+        
+        // Load Admin Keys
+        document.getElementById('adminLoginPass').value = data.adminLogin || "";
+        document.getElementById('championRemovePass').value = data.coreRemove || "";
+        
+        // Load Users
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = "";
+        
+        const users = [];
+        // Iterate through the 'users' object
+        if (data.users) {
+            for (const [code, info] of Object.entries(data.users)) {
+                users.push({ code, ...info });
+            }
+        }
+
+        // Sort by Role Priority
+        const roleOrder = { "creator": 1, "admin": 2, "member": 3 };
+        users.sort((a, b) => {
+            const rA = (a.role || "").toLowerCase();
+            const rB = (b.role || "").toLowerCase();
+            return (roleOrder[rA] || 99) - (roleOrder[rB] || 99);
+        });
+
+        users.forEach(u => {
+            const tr = document.createElement('tr');
+            let badgeClass = "role-member";
+            const roleLower = (u.role || "").toLowerCase();
+            
+            if(roleLower === "creator") badgeClass = "role-creator";
+            else if(roleLower === "admin") badgeClass = "role-admin";
+            
+            tr.innerHTML = `
+                <td><strong>${u.name}</strong></td>
+                <td><span class="role-badge ${badgeClass}">${u.role}</span></td>
+                <td><input type="text" id="input-${u.code}" value="${u.code}" placeholder="Enter Login Code"></td>
+                <td style="text-align: right;">
+                    <button class="btn btn-icon" onclick="updateUserCode('${u.code}')">💾</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function saveAdminPasswords() {
+        const data = getData();
+        const newLogin = document.getElementById('adminLoginPass').value.trim();
+        const newRemove = document.getElementById('championRemovePass').value.trim();
+        
+        if (!newLogin || !newRemove) return alert("❌ Error: Fields cannot be empty.");
+        
+        data.adminLogin = newLogin;
+        data.coreRemove = newRemove; // Ensure key matches structure
+        
+        saveData(data);
+        alert("✅ Admin Security Keys Updated!");
+    }
+
+    function updateUserCode(oldCode) {
+        const input = document.getElementById(`input-${oldCode}`);
+        const newCode = input.value.trim();
+        const data = getData();
+        
+        if (!newCode) return alert("❌ Error: Login code cannot be empty.");
+        if (newCode === oldCode) return alert("⚠️ No changes detected.");
+        if (data.users[newCode]) return alert(`❌ Error: Code already used.`);
+        
+        if (confirm(`⚠️ Change password for ${data.users[oldCode].name}?\nFrom: ${oldCode}\nTo: ${newCode}`)) {
+            // Copy data to new key
+            data.users[newCode] = data.users[oldCode];
+            // Delete old key
+            delete data.users[oldCode];
+            
+            saveData(data);
+            alert("✅ Login Code Updated Successfully!");
+            loadData();
+        }
+    }
+</script>
+</body>
+</html>
